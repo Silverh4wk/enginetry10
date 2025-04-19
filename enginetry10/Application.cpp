@@ -641,7 +641,10 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 			XAudioClass_ = new XAudioClass;
 			XAudioSoundClass* TestSound1;
 			char soundFilename[128];
-
+			
+			win32InitSound(Window, SoundOutput.SamplerperSecond, SoundOutput.BufferSize);
+			win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.BufferSize);
+			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
 			/*	HRESULT result = XAudioClass_->Initialize();
 				if (!result)
@@ -667,8 +670,6 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 				}
 				*/
 
-			win32InitSound(Window, SoundOutput.SamplerperSecond, SoundOutput.BufferSize);
-			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
 			GlobalRunning = true;
 			while (GlobalRunning)
@@ -771,11 +772,12 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 				{
 					DWORD ByteToLock = (SoundOutput.RunningSampleIndex * SoundOutput.BytesPerSample) % SoundOutput.BufferSize;
 					DWORD WriteBytes;
+
 					if (ByteToLock == PlayCursor)
 					{
-						WriteBytes = SoundOutput.BufferSize ;
+						WriteBytes = 0;
 					}
-					if (ByteToLock > PlayCursor)
+					else if (ByteToLock > PlayCursor)
 					{
 						WriteBytes = SoundOutput.BufferSize - ByteToLock;
 						WriteBytes += PlayCursor;
