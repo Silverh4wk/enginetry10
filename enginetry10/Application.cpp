@@ -81,6 +81,8 @@ XAudioClass::XAudioClass() {
 
 XAudioClass::XAudioClass(const XAudioClass& other)
 {
+	XAudio2 = 0;
+	MasterVoice = 0;
 }
 
 
@@ -258,17 +260,17 @@ RenderCode(win32_offscreen_buffer *Buffer,int BlueOffset, int GreenOffset)
 				X < Buffer->Width;
 				++X)
 			{
-				uint8 Green = (Y+GreenOffset)*1.2;
-				/*uint8 Blue  = (Y+BlueOffset);
-				*Pixel++ = ((Blue<< 8) | Green); */// to fix the little endian change that was enforced by windows when writing to register 
-				uint8 Color = (uint8)(
+				uint8 Green = (Y+GreenOffset);
+				uint8 Blue  = (Y+BlueOffset);
+				*Pixel++ = ((Blue<< 8) | Green); // to fix the little endian change that was enforced by windows when writing to register 
+			/*	uint8 Color = (uint8)(
 					128.0f + (128.0f * (tan(X / 32.0f))) +
 					128.0f + (128.0f * sin(Y / 8.0f)) +
 					128.0f + (128.0f * sin((X  + GreenOffset) / 32.0f))
-					) / 2;
+					) / 2;*/
 
 				// BB GG RR AA
-				*Pixel++ = (Color << 0) | (Color << 8) | (Color << 16);
+				//*Pixel++ = (Color << 0) | (Color << 8) | (Color << 16);
 			}
 			Row += Buffer->Pitch;
 		}
@@ -586,6 +588,10 @@ void win32FillSoundBuffer(dsound_Sound_Output* SoundOutput, DWORD ByteToLock, DW
 int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, int showCode)
 {
 	
+	LARGE_INTEGER PerfCounterFrequencyResult;
+	QueryPerformanceFrequency(&PerfCounterFrequencyResult);
+	int64 PerfCounterFrequency = PerfCounterFrequencyResult.QuadPart;
+
 	win32_LoadXInput();
 	WNDCLASSEXA WindowClass = {0};
 	Win32_ResizeDIBSection(&BackBuffer, 1280, 720);
@@ -600,7 +606,7 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 	WindowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
 	WindowClass.hbrBackground = NULL;
 	WindowClass.lpszClassName = "scratchGameWindowClass";
-
+	
 	//if true, create Window
 	//https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerclassa
 	DWORD dw = GetLastError();
@@ -622,6 +628,10 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 		);
 		if (Window)
 		{
+			LARGE_INTEGER BeginCounter;
+			QueryPerformanceCounter(&BeginCounter);
+			BeginCounter.QuadPart;
+
 			//graphics data 
 			HDC DeviceContext = GetDC(Window);
 
@@ -644,13 +654,13 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 			
 			win32InitSound(Window, SoundOutput.SamplerperSecond, SoundOutput.BufferSize);
 			win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.BufferSize);
-			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
+			//GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
-			/*	HRESULT result = XAudioClass_->Initialize();
-				if (!result)
+				HRESULT result = XAudioClass_->Initialize();
+				if (FAILED(result))
 				{
 					MessageBox(Window, L"Could not initialize XAudio.", L"Error", MB_OK);
-					return false;
+					return FALSE;
 				}
 
 				TestSound1 = new XAudioSoundClass;
@@ -658,18 +668,22 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 				strcpy_s(soundFilename, "01_Children_of_the_Omnissiah.wav");
 
 				result = TestSound1->LoadTrack(XAudioClass_->GetXAudio2(), soundFilename, 1.0f);
-				if (!result)
+				if (FAILED(result))
 				{
 					MessageBox(Window, L"Could not initialize test sound object.", L"Error", MB_OK);
-					return false;
+					return FALSE;
 				}
 				result = TestSound1->PlayTrack();
 				if (FAILED(result)) {
 					MessageBox(Window, L"Could not Play test sound object.", L"Error", MB_OK);
-					return false;
+					return FALSE;
 				}
-				*/
+				
 
+			LARGE_INTEGER LastCounter;
+			QueryPerformanceCounter(&LastCounter);
+			
+			int64 LastCycleCount = __rdtsc();
 
 			GlobalRunning = true;
 			while (GlobalRunning)
@@ -685,25 +699,25 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 					if (Message.message == WM_QUIT)
 					{
 						GlobalRunning = false;
-						// Release the test sound object.
-						//if (TestSound1)
-						//{
-						//	// Stop the sound if it was still playing.
-						//	TestSound1->StopTrack();
+						 //Release the test sound object.
+						if (TestSound1)
+						{
+							// Stop the sound if it was still playing.
+							TestSound1->StopTrack();
 
-						//	// Release the test sound object.
-						//	TestSound1->ReleaseTrack();
-						//	delete TestSound1;
-						//	TestSound1 = 0;
-						//}
+							// Release the test sound object.
+							TestSound1->ReleaseTrack();
+							delete TestSound1;
+							TestSound1 = 0;
+						}
 
-						//// Release the XAudio object.
-						//if (XAudioClass_)
-						//{
-						//	XAudioClass_->Shutdown();
-						//	delete XAudioClass_;
-						//	XAudioClass_ = 0;
-						//}
+						// Release the XAudio object.
+						if (XAudioClass_)
+						{
+							XAudioClass_->Shutdown();
+							delete XAudioClass_;
+							XAudioClass_ = 0;
+						}
 
 					}
 
@@ -787,10 +801,27 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 						WriteBytes = PlayCursor - ByteToLock;
 
 					}
+					uint64 EndCycleCount = __rdtsc();
+					
 					win32FillSoundBuffer(&SoundOutput, ByteToLock, WriteBytes);
 					win32_WindowDimensions D = GetWindowDimensions(Window);
 					win32_DisplayBufferInWindow(&BackBuffer, DeviceContext,
 						D.Width, D.Height);
+
+					LARGE_INTEGER EndCounter;
+					QueryPerformanceCounter(&EndCounter);
+					
+					uint64 CyclesElapsed = EndCycleCount - LastCycleCount;
+
+					int64 ElapsedCounter = EndCounter.QuadPart - LastCounter.QuadPart;
+					int32 msPerFrame = (1000*ElapsedCounter) / PerfCounterFrequency;
+					int32 FPS = PerfCounterFrequency / ElapsedCounter;
+					int32 MCPF = (int32)(CyclesElapsed / (pow(1000,2)));
+					char Buffer[256];
+					wsprintfA(Buffer, " %dms/f, %df/s,  %dmc/f\n", msPerFrame, FPS, MCPF);
+					OutputDebugStringA(Buffer);
+					LastCounter = EndCounter;
+					LastCycleCount = EndCycleCount;
 				}
 			}
 		}
