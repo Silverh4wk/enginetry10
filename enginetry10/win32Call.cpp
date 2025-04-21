@@ -16,13 +16,25 @@ ok so first talk abt the headers and the special type defs that i have going on
 -->Painting of the application 
 -->win32XAudioInit()
 -->
-
-
-
 */
 
 
+/*
+         CHECKLIST
 
+-save game location 
+-getting a handle to our own exe file 
+-asset loading path 
+-threading 
+-raw input 
+-sleep and time begin period 
+-clipcursor for multimonitor support and full screen support 
+-WM_SETCURSOR (Invinsible)
+-WM_ACTIVATEAPP 
+-blitspeed improvement 
+-hardware accel 
+
+*/
 
 #include <windows.h>
 #include <Xinput.h>
@@ -30,33 +42,28 @@ ok so first talk abt the headers and the special type defs that i have going on
 #include "Helpers.h"
 #include "XAudioClass.h"
 #include "XAudioSoundClass.h"
+#include "GameCode.h"
 #include <math.h>
 
-#define global_variable  static 
-#define local_persist static 
-#define internal static  
-#define Pi32 3.14159265359f
+
 //A library-search record in the object file.
 #pragma comment(lib, "dsound.lib") // DirectSound that i may later update to xAudio
 #pragma comment(lib, "dxguid.lib")// 
 #pragma comment(lib, "winmm.lib")// windows mulitmedia wrapper 
 
 
-// Offscreen render buffer: stores pixel data in memory before it's displayed on the screen.
-// Used for software rendering and double-buffering to avoid flicker.
-struct win32_offscreen_buffer{
+struct win32_WindowDimensions {
+	int Width;
+	int Height;
+};
+
+struct win32_offscreen_buffer {
 	BITMAPINFO BitMapInfo;
 	void* BitMapMemory;
 	int Width;
 	int Height;
 	int BytesPerPixel;
 	int Pitch;
-};
-
-
-struct win32_WindowDimensions {
-	int Width;
-	int Height;
 };
 
 struct dsound_Sound_Output 
@@ -233,6 +240,7 @@ global_variable win32_offscreen_buffer BackBuffer; // OffScreen render buffer
 global_variable int XOffset = 0; //just for testing the pixel drawing on the X-axis
 global_variable int YOffset = 0; //just for testing the pixel drawing on the Y-axis
 global_variable LPDIRECTSOUNDBUFFER GlobalSecondaryBuffer; //Audio mixing happens here
+global_variable dsound_Sound_Output SoundOutput = {};
 
 // ==== Stub Rendering Code ====
 //
@@ -244,38 +252,6 @@ global_variable LPDIRECTSOUNDBUFFER GlobalSecondaryBuffer; //Audio mixing happen
 // Note: Assumes 32-bit (4 bytes per pixel) pixel format. Pixels are written
 // as 0x00BBGGRR due to little-endian byte order on Windows.
 // Which is fixed by shifting by 8 bits every time a row is drawn.
-
-internal void
-RenderCode(win32_offscreen_buffer *Buffer,int BlueOffset, int GreenOffset)
-{
-	Buffer->BytesPerPixel = 4;
-
-
-		uint8* Row = (uint8*)Buffer->BitMapMemory;
-		for (int Y = 0;
-			Y < Buffer->Height;
-			++Y) {
-			uint32* Pixel = (uint32*)Row;
-			for (int X = 0;
-				X < Buffer->Width;
-				++X)
-			{
-				uint8 Green = (Y+GreenOffset);
-				uint8 Blue  = (Y+BlueOffset);
-				*Pixel++ = ((Blue<< 8) | Green); // to fix the little endian change that was enforced by windows when writing to register 
-			/*	uint8 Color = (uint8)(
-					128.0f + (128.0f * (tan(X / 32.0f))) +
-					128.0f + (128.0f * sin(Y / 8.0f)) +
-					128.0f + (128.0f * sin((X  + GreenOffset) / 32.0f))
-					) / 2;*/
-
-				// BB GG RR AA
-				//*Pixel++ = (Color << 0) | (Color << 8) | (Color << 16);
-			}
-			Row += Buffer->Pitch;
-		}
-}
-
 
 
 
@@ -391,7 +367,7 @@ MainWindowCallBack(HWND Window,
 	case WM_KEYUP:
 	{
 
-		uint32 VKCode = wParam;
+		uint32 VKCode = (uint32)wParam;
 		bool WasDown = ((lParam & (1 << 30)) != 0);
 		bool IsDown = ((lParam & (1 << 31)) == 0);
 		bool AltKeyIsDown = ((lParam & (1 << 29)) != 0);
@@ -402,6 +378,7 @@ MainWindowCallBack(HWND Window,
 			else if (VKCode == 'A') {
 				OutputDebugStringA("A\n");
 				YOffset+= 4;
+
 			}
 			else if (VKCode == 'S') {
 				OutputDebugStringA("S\n");
@@ -530,7 +507,7 @@ win32InitSound(HWND Window,int32 SamplesPerSecond,int32 BufferSize)
 internal void
 win32XAudioInit() {
 	XAudio2Create(
-		0,0, XAUDIO2_DEFAULT_PROCESSOR
+		0, 0, XAUDIO2_DEFAULT_PROCESSOR
 	);
 
 }
@@ -654,13 +631,13 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 			
 			win32InitSound(Window, SoundOutput.SamplerperSecond, SoundOutput.BufferSize);
 			win32FillSoundBuffer(&SoundOutput, 0, SoundOutput.BufferSize);
-			//GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
-
-				HRESULT result = XAudioClass_->Initialize();
+			GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
+			HRESULT result;
+				result = XAudioClass_->Initialize();
 				if (FAILED(result))
 				{
 					MessageBox(Window, L"Could not initialize XAudio.", L"Error", MB_OK);
-					return FALSE;
+					return result;
 				}
 
 				TestSound1 = new XAudioSoundClass;
@@ -671,13 +648,13 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 				if (FAILED(result))
 				{
 					MessageBox(Window, L"Could not initialize test sound object.", L"Error", MB_OK);
-					return FALSE;
+					return result;
 				}
-				result = TestSound1->PlayTrack();
-				if (FAILED(result)) {
+				//result = TestSound1->PlayTrack();
+				/*if (FAILED(result)) {
 					MessageBox(Window, L"Could not Play test sound object.", L"Error", MB_OK);
-					return FALSE;
-				}
+					return result;
+				}*/
 				
 
 			LARGE_INTEGER LastCounter;
@@ -726,6 +703,7 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 				}
 
 				//loop thro the connected controllers and get their inputs, if found any 
+				
 				for (DWORD ControllerIndex = 0;
 					ControllerIndex < XUSER_MAX_COUNT;
 					++ControllerIndex)
@@ -749,6 +727,15 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 						bool B = (GamePad->wButtons & XINPUT_GAMEPAD_B);
 						bool X = (GamePad->wButtons & XINPUT_GAMEPAD_X);
 						bool Y = (GamePad->wButtons & XINPUT_GAMEPAD_Y);
+						int16 StickX = GamePad->sThumbLX;
+						int16 StickY = GamePad->sThumbLY;
+
+
+						XOffset = StickX / 4096;
+						YOffset = StickY / 4096;
+
+						SoundOutput.ToneHz = 512 + (int)(256.0f * ((real32)StickY / 3000.0f));
+						SoundOutput.WavePeriod = SoundOutput.SamplerperSecond / SoundOutput.ToneHz;
 
 						XINPUT_VIBRATION Vibration;
 						Vibration.wLeftMotorSpeed = 2;
@@ -774,8 +761,13 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 					}
 
 				}
+				Game_offscreen_buffer Buffer; 
+				Buffer.BitMapMemory = BackBuffer.BitMapMemory;
+				Buffer.Width = BackBuffer.Width;
+				Buffer.Height= BackBuffer.Height;
+				Buffer.Pitch= BackBuffer.Pitch;
 
-				RenderCode(&BackBuffer, XOffset, YOffset);
+				GameUpdateAndRender(&Buffer, XOffset, YOffset);
 
 				//locking of the buffer and unlocking it
 				DWORD PlayCursor;
@@ -814,8 +806,8 @@ int CALLBACK WinMain(HINSTANCE Instance, HINSTANCE PrevInstance, LPSTR CmdLine, 
 					uint64 CyclesElapsed = EndCycleCount - LastCycleCount;
 
 					int64 ElapsedCounter = EndCounter.QuadPart - LastCounter.QuadPart;
-					int32 msPerFrame = (1000*ElapsedCounter) / PerfCounterFrequency;
-					int32 FPS = PerfCounterFrequency / ElapsedCounter;
+					int32 msPerFrame = (int32)((1000*ElapsedCounter) / PerfCounterFrequency);
+					int32 FPS = (int32)(PerfCounterFrequency / ElapsedCounter);
 					int32 MCPF = (int32)(CyclesElapsed / (pow(1000,2)));
 					char Buffer[256];
 					wsprintfA(Buffer, " %dms/f, %df/s,  %dmc/f\n", msPerFrame, FPS, MCPF);

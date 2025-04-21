@@ -11,3 +11,7 @@ typedef int64_t int64;
 typedef float real32 ;
 typedef double real64 ;
 
+#define global_variable  static 
+#define local_persist static 
+#define internal static  
+#define Pi32 3.14159265359f

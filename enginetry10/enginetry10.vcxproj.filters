@@ -15,13 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="win32Call.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helpers.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XAudioSouncClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="XAudioSoundClass.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCode.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
