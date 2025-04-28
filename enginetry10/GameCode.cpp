@@ -24,7 +24,7 @@ GameOutputSound(Game_Sound_Output_Buffer*SoundBuffer, int ToneHz)
 }
 
 internal void
-RenderCode(Game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
+RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 {
 	Buffer->BytesPerPixel = 4;
 
@@ -56,7 +56,30 @@ RenderCode(Game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 }
 
 
- void GameUpdateAndRender(Game_offscreen_buffer* Buffer, Game_Sound_Output_Buffer *SoundBuffer,int BlueOffset, int GreenOffset, int ToneHz) {
+ void GameUpdateAndRender(game_input* Input,game_offscreen_buffer* Buffer, Game_Sound_Output_Buffer *SoundBuffer) {
+	 local_persist int BlueOffset;
+	 local_persist int GreenOffset;
+	 local_persist int ToneHz = 256;
+
+	 game_controller_input* Input0 = &Input->Controllers[0];
+	 if (Input0->isAnalogue) 
+	 {
+		 ToneHz = 256 + (int)120.0f * (Input0->EndY);
+		 BlueOffset += (int)4.0f * (Input0->EndX);
+	 }
+	 else
+	 {
+	 }
+	 //Input0->Down.EndedDown;
+	 //Input.AButtonHalfTransitionCount;
+
+	 if (Input0->Down.EndedDown) {
+		 BlueOffset -= 1;
+	 }else if (Input0->Right.EndedDown) {
+		 GreenOffset -= 1;
+	 }
+	
+
 	 GameOutputSound(SoundBuffer,ToneHz);
 	 RenderCode(Buffer, BlueOffset, GreenOffset);
 
