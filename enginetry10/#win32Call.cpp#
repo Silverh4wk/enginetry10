@@ -96,9 +96,11 @@ XAudioClass::~XAudioClass()
 {
 }
 
+
 bool XAudioClass::Initialize()
 {
 	HRESULT result;
+	
 	// Initialize COM first.
 	result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if (FAILED(result))

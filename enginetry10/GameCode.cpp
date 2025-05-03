@@ -13,18 +13,18 @@ GameOutputSound(Game_Sound_Output_Buffer*SoundBuffer, int ToneHz)
 
 	for (int SampleIndex = 0; SampleIndex < SoundBuffer->SampleCount; ++SampleIndex)
 	{
+		real32 SineValue = sinf(tSine) ;
 
-		real32 SineValue = sinf(tSine);
-		int16 SampleValue = (int16)(SineValue *Volume);
+		int16 SampleValue = (int16)(SineValue * Volume);
 		*SampleOut++ = SampleValue;
 		*SampleOut++ = SampleValue;
-		tSine += 2.0f * Pi32 *1.0f / (real32) WavePeriod;
+		tSine += 2.0f * Pi32 / (real32) WavePeriod;
 	
 	}
 }
 
 internal void
-RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
+RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset, int TestOffset, int TestOffset2)
 {
 	Buffer->BytesPerPixel = 4;
 
@@ -38,8 +38,8 @@ RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 			X < Buffer->Width;
 			++X)
 		{
-			uint8 Green = (uint8)(Y + GreenOffset) ;
-			uint8 Blue = (uint8)(Y + BlueOffset) ;
+			uint8 Green = (uint8)(Y + TestOffset2) ;
+			uint8 Blue = (uint8)(Y + TestOffset) ;
 			uint8 Red = (uint8)(Y) ;
 			//*Pixel++ = ((Blue << 8) | Green); // to fix the little endian change that was enforced by windows when writing to register 
 					*Pixel++ = (Blue << 0) | (Green<< 8) | (Red<< 16);
@@ -56,7 +56,8 @@ RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 }
 
 
- void GameUpdateAndRender(game_input* Input,game_offscreen_buffer* Buffer, Game_Sound_Output_Buffer *SoundBuffer) {
+void
+GameUpdateAndRender(game_input* Input, game_offscreen_buffer* buffer, Game_Sound_Output_Buffer* SoundBuffer, int TestOffset, int TestOffset2) {
 	 local_persist int BlueOffset;
 	 local_persist int GreenOffset;
 	 local_persist int ToneHz = 256;
@@ -81,7 +82,7 @@ RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 	
 
 	 GameOutputSound(SoundBuffer,ToneHz);
-	 RenderCode(Buffer, BlueOffset, GreenOffset);
+	 RenderCode(buffer, BlueOffset, GreenOffset, TestOffset, TestOffset2);
 
 }
 
