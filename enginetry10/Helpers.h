@@ -20,14 +20,9 @@ typedef uint32_t bool32;
 
 template<typename T> 
 internal void 
-
-
-
 Swap(T* NewInput, T *OldInput)
 {
-  //lets say i addded a comment here or something
-  T *temp = {};
-	temp = NewInput;
-	NewInput = OldInput;
-	OldInput = temp;
+	T temp = *NewInput;
+	*NewInput = *OldInput;
+	*OldInput = temp;
 }

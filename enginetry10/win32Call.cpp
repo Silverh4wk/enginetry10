@@ -40,6 +40,7 @@ ok so first talk abt the headers and the special type defs that i have going on
 #include "GameCode.h"
 #include <windows.h>
 #include <malloc.h>
+#include "DataStructures.h"
 #include <Xinput.h>
 #include <dsound.h>
 #include "XAudioClass.h"
@@ -336,6 +337,7 @@ MainWindowCallBack(HWND Window,
 	LRESULT Result = 0;
 	//To be filled later, rn is used mostly for debugging 
 	// and checking if those messages are actually getting handled properly
+    
 
 	switch (Message) 
 	{

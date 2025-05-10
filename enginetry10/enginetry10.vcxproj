@@ -127,12 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TestingGround.cpp" />
     <ClCompile Include="win32Call.cpp" />
     <ClCompile Include="Helpers.h" />
     <ClCompile Include="GameCode.cpp" />
     <ClCompile Include="XAudioSouncClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DataStructures.h" />
     <ClInclude Include="GameCode.h" />
     <ClInclude Include="XAudioClass.h" />
     <ClInclude Include="XAudioSoundClass.h" />

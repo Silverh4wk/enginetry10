@@ -27,6 +27,9 @@
     <ClCompile Include="GameCode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestingGround.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XAudioClass.h">
@@ -37,6 +40,9 @@
     </ClInclude>
     <ClInclude Include="GameCode.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataStructures.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
