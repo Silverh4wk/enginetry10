@@ -6,7 +6,7 @@
 int main() {
   int A[] = { 67,36,89,1,37,56,27,82,89,27 };
     int ArraySize = ArrayCount(A);
-    DescSelectionSort(A,ArraySize);
+    DescHeapSort(A,ArraySize);
 
     printf("Array after sorting: ");
     char Buffer[256];

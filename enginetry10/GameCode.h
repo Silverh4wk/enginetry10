@@ -48,10 +48,34 @@ struct game_input
 {
 	game_controller_input Controllers[4];
 };
+
+struct game_state
+{
+  int ToneHz;
+  int GreenOffset;
+  int BlueOffset;
+};
+
 struct Game_Sound_Output_Buffer {
 	int SampleCount;
 	int SamplesPerSecond;
 	int16* Samples;
 };
-void 
-GameUpdateAndRender(game_input *Input,game_offscreen_buffer *buffer, Game_Sound_Output_Buffer *SoundBuffer, int TestOffset, int TestOffset2);
+
+
+
+struct game_memory
+{
+  bool32 IsInit;
+  
+  uint64 PermanentStorageSize;
+  void *PermanentStorage;
+  
+  uint64 TransientStorageSize;
+  void * TransientStorage;
+};
+
+
+
+void GameUpdateAndRender(game_memory* Memory, game_input* Input,
+	game_offscreen_buffer* buffer, Game_Sound_Output_Buffer* SoundBuffer);

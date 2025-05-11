@@ -17,6 +17,16 @@ typedef uint32_t bool32;
 #define internal static  
 #define Pi32 3.14159265359f
 #define ArrayCount(Array) (sizeof(Array)/sizeof(Array[0]))
+#define MegaBytes(Value) (Value*1024)
+#define KiloBytes(Value) (MegaBytes(Value)*1024)
+#define GigaBytes(Value) (KiloBytes(Value)*1024)
+
+#if GAME_SLOW
+#define Assert(Expression) \
+	if(!Exoression){*(int*)0 = 0;}
+#else
+#define Asser(Expression)
+#endif
 
 template<typename T> 
 internal void 

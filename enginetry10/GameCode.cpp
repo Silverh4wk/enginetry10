@@ -24,7 +24,7 @@ GameOutputSound(Game_Sound_Output_Buffer*SoundBuffer, int ToneHz)
 }
 
 internal void
-RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset, int TestOffset, int TestOffset2)
+RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset)
 {
 	Buffer->BytesPerPixel = 4;
 
@@ -38,8 +38,8 @@ RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset, int T
 			X < Buffer->Width;
 			++X)
 		{
-			uint8 Green = (uint8)(Y + TestOffset2) ;
-			uint8 Blue = (uint8)(Y + TestOffset) ;
+			uint8 Green = (uint8)(Y + GreenOffset) ;
+			uint8 Blue = (uint8)(Y + BlueOffset) ;
 			uint8 Red = (uint8)(Y) ;
 			//*Pixel++ = ((Blue << 8) | Green); // to fix the little endian change that was enforced by windows when writing to register 
 					*Pixel++ = (Blue << 0) | (Green<< 8) | (Red<< 16);
@@ -56,17 +56,25 @@ RenderCode(game_offscreen_buffer* Buffer, int BlueOffset, int GreenOffset, int T
 }
 
 
-void
-GameUpdateAndRender(game_input* Input, game_offscreen_buffer* buffer, Game_Sound_Output_Buffer* SoundBuffer, int TestOffset, int TestOffset2) {
-	 local_persist int BlueOffset;
-	 local_persist int GreenOffset;
-	 local_persist int ToneHz = 256;
-
+void GameUpdateAndRender(game_memory *Memory,game_input* Input,
+                    game_offscreen_buffer* buffer,
+                    Game_Sound_Output_Buffer* SoundBuffer)
+{
+	Assert(sizeof(game_state) <= Memory->PermanentStorageSize);
+           game_state *GameState = (game_state*)Memory->PermanentStorage;
 	 game_controller_input* Input0 = &Input->Controllers[0];
+
+            if(!Memory->IsInit)
+          {
+            GameState->ToneHz = 256;
+            GameState->GreenOffset = 0;
+            GameState->BlueOffset = 0;
+			Memory->IsInit = true;
+          }
 	 if (Input0->isAnalogue) 
 	 {
-		 ToneHz = 256 + (int)120.0f * (Input0->EndY);
-		 BlueOffset += (int)4.0f * (Input0->EndX);
+		 GameState->ToneHz = 256 + (int)120.0f * (Input0->EndY);
+		 GameState->BlueOffset += (int)4.0f * (Input0->EndX);
 	 }
 	 else
 	 {
@@ -75,14 +83,14 @@ GameUpdateAndRender(game_input* Input, game_offscreen_buffer* buffer, Game_Sound
 	 //Input.AButtonHalfTransitionCount;
 
 	 if (Input0->Down.EndedDown) {
-		 BlueOffset -= 1;
+		 GameState->BlueOffset -= 1;
 	 }else if (Input0->Right.EndedDown) {
-		 GreenOffset -= 1;
+		 GameState->GreenOffset -= 1;
 	 }
 	
 
-	 GameOutputSound(SoundBuffer,ToneHz);
-	 RenderCode(buffer, BlueOffset, GreenOffset, TestOffset, TestOffset2);
+	 GameOutputSound(SoundBuffer,GameState->ToneHz);
+	 RenderCode(buffer,GameState->BlueOffset,GameState-> GreenOffset);
 
 }
 

@@ -81,3 +81,19 @@ HeapSort( T A[],int ArraySize)
     Heapify(A,--ArraySize,0);
   }
 }
+
+template <typename T>
+internal void
+DescHeapSort( T A[],int ArraySize)
+{
+  for (int ParentIndex = (ArraySize-2)/2; ParentIndex>=0; ParentIndex --)
+  {
+    Heapify(A,ArraySize,ParentIndex);
+  }
+
+  for(int i = ArraySize-1; i>= 1; i--)
+  {
+    Swap(A, A+i);
+    Heapify(A,ArraySize,ArraySize-1);
+  }
+}
