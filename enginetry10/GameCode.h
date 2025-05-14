@@ -1,4 +1,4 @@
-#pragma once
+#if !defined(GAMECODE_H)
 #include<math.h>
 #include "Helpers.h"
 //handles the input, the sound, the rendering and the timing 
@@ -6,6 +6,14 @@
 
 // Offscreen render buffer: stores pixel data in memory before it's displayed on the screen.
 // Used for software rendering and double-buffering to avoid flicker.
+
+
+#if GAME_ITNERNAL
+void *DEBUGPlatformReadEntireFile(char* FileName);
+void  DEBUGPlatformFreeMem(void *Memory);
+
+bool32 *DEBUGPlatformReadEntireFile(char* FileName, uint32 MemorySize, void * Memory);
+#endif
 struct game_offscreen_buffer {
 	void* BitMapMemory;
 	int Width;
@@ -63,7 +71,10 @@ struct Game_Sound_Output_Buffer {
 };
 
 
-
+struct game_clock 
+{
+	real32 SecondsElapsed;
+};
 struct game_memory
 {
   bool32 IsInit;
@@ -79,3 +90,5 @@ struct game_memory
 
 void GameUpdateAndRender(game_memory* Memory, game_input* Input,
 	game_offscreen_buffer* buffer, Game_Sound_Output_Buffer* SoundBuffer);
+#define GameCode_H
+#endif

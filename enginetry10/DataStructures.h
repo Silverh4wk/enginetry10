@@ -1,4 +1,4 @@
-#pragma once
+#if !defined(DATASTRUCTURES_H)
 #include "Helpers.h"
 //Node
 struct Node
@@ -97,3 +97,5 @@ DescHeapSort( T A[],int ArraySize)
     Heapify(A,ArraySize,ArraySize-1);
   }
 }
+#define DATASTRUCTURES_H
+#endif

@@ -131,7 +131,7 @@
     <ClCompile Include="win32Call.cpp" />
     <ClCompile Include="Helpers.h" />
     <ClCompile Include="GameCode.cpp" />
-    <ClCompile Include="XAudioSouncClass.cpp" />
+    <ClCompile Include="XAudioSoundClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataStructures.h" />

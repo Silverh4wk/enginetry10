@@ -21,7 +21,7 @@
     <ClCompile Include="Helpers.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XAudioSouncClass.cpp">
+    <ClCompile Include="XAudioSoundClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameCode.cpp">

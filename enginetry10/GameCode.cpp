@@ -60,12 +60,14 @@ void GameUpdateAndRender(game_memory *Memory,game_input* Input,
                     game_offscreen_buffer* buffer,
                     Game_Sound_Output_Buffer* SoundBuffer)
 {
-	Assert(sizeof(game_state) <= Memory->PermanentStorageSize);
-           game_state *GameState = (game_state*)Memory->PermanentStorage;
+            Assert(sizeof(game_state) <= Memory->PermanentStorageSize);
+            game_state *GameState = (game_state*)Memory->PermanentStorage;
 	 game_controller_input* Input0 = &Input->Controllers[0];
 
             if(!Memory->IsInit)
           {
+           // char *FileName ="test.bmp";
+            
             GameState->ToneHz = 256;
             GameState->GreenOffset = 0;
             GameState->BlueOffset = 0;
@@ -74,7 +76,7 @@ void GameUpdateAndRender(game_memory *Memory,game_input* Input,
 	 if (Input0->isAnalogue) 
 	 {
 		 GameState->ToneHz = 256 + (int)120.0f * (Input0->EndY);
-		 GameState->BlueOffset += (int)4.0f * (Input0->EndX);
+		 GameState->BlueOffset += (int)4.0f * (Input0->EndY);
 	 }
 	 else
 	 {
@@ -84,7 +86,7 @@ void GameUpdateAndRender(game_memory *Memory,game_input* Input,
 
 	 if (Input0->Down.EndedDown) {
 		 GameState->BlueOffset -= 1;
-	 }else if (Input0->Right.EndedDown) {
+	 }else if (Input0->Up.EndedDown) {
 		 GameState->GreenOffset -= 1;
 	 }
 	

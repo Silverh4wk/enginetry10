@@ -1,5 +1,6 @@
 #pragma once 
 #include <stdint.h>
+
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
@@ -12,20 +13,24 @@ typedef float real32 ;
 typedef double real64 ;
 typedef uint32_t bool32;
 
-#define global_variable  static 
+#define global_variable  static
+
 #define local_persist static 
 #define internal static  
+
 #define Pi32 3.14159265359f
 #define ArrayCount(Array) (sizeof(Array)/sizeof(Array[0]))
-#define MegaBytes(Value) (Value*1024)
-#define KiloBytes(Value) (MegaBytes(Value)*1024)
-#define GigaBytes(Value) (KiloBytes(Value)*1024)
+
+#define KiloBytes(Value) (Value*1024)
+#define MegaBytes(Value) (KiloBytes(Value)*1024)
+#define GigaBytes(Value) (MegaBytes(Value)*1024)
+#define TeraBytes(Value) (GigaBytes(Value)*1024)
 
 #if GAME_SLOW
 #define Assert(Expression) \
-	if(!Exoression){*(int*)0 = 0;}
+	if(!Expression){*(int*)0 = 0;}
 #else
-#define Asser(Expression)
+#define Assert(Expression)
 #endif
 
 template<typename T> 
@@ -34,5 +39,5 @@ Swap(T* NewInput, T *OldInput)
 {
 	T temp = *NewInput;
 	*NewInput = *OldInput;
-	*OldInput = temp;
+     *OldInput = temp;
 }

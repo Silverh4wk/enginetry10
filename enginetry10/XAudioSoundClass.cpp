@@ -1,4 +1,4 @@
-#include "xaudiosoundclass.h"
+#include "XaudioSoundClass.h"
 
 
 XAudioSoundClass::XAudioSoundClass()

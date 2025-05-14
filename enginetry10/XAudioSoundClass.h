@@ -4,7 +4,7 @@
 //(ToDO: Silver): read more abt audio mixing and how it works to prepare a better document
 
 #pragma once
-#include "xaudioclass.h"
+#include "XAudioClass.h"
 
 class XAudioSoundClass
 {
