@@ -1,10 +1,103 @@
 #if !defined(DATASTRUCTURES_H)
 #include "Helpers.h"
+#include <cstdlib>
+#include <cstdio>
 //Node
-struct Node
+typedef struct Node
 {
-  
+  int Data;
+  Node* Next ;
+  Node* Prev;
+  Node(int val) : Data(val), Next(nullptr), Prev(nullptr) {}
+}Node;
+
+
+
+class LinkedList{
+public:
+
+  Node* NewNode;
+
+    // Container pointers and counter
+    Node* Head;   // Pointer to the first node (when this is acting as container)
+    Node* Tail;   // Pointer to the last node (when this is acting as container)
+    int count;
+
+    // Constructors/Destructor and assignment operators
+  //   LinkedList();
+  LinkedList() : Head(nullptr), Tail(nullptr), count(0) {}
+  //LinkedList(int data);
+  //  LinkedList(const LinkedList& other);
+  //  LinkedList& operator=(const LinkedList& other);
+  //  LinkedList(LinkedList&& other);
+  //  LinkedList& operator=(LinkedList&& other);
+  // ~LinkedList();
+
+    // Methods for list manipulation
+  //  void insertNodeAtIndex(int index, int data);
+    void push_front(int Data);
+  // void push_back(int Data);
+  // void pop_front();
+  // void deleteNodeAtIndex(int index);
+  // Node getNode(int index);
+  // void deleteNode(Node * NewNode);
+
+    // Queue operations
+    //void enqueue(int Data);
+    //void dequeue();
+    //int front();
+    //int back();
+
+    //void clearList();
+    void forwardPrint();
+  // void reversePrint();
+  // int getSize();
+  // bool empty();
 };
+
+// Push front: add a node to the front of the list.
+ void LinkedList::push_front(int Data) {
+   Node* temp = new Node(Data);
+    if (Head == nullptr) {
+        Head = Tail = temp;
+    }
+    else {
+        temp->Next = Head;
+        Head->Prev = temp;
+        Head = temp;
+    }
+    count++;
+}
+
+
+void LinkedList::forwardPrint() {
+Node* temp = Head;
+while (temp != nullptr) {
+    printf("%d ", temp->Data);
+    temp = temp->Next;
+}
+     printf("\n");
+}
+
+
+ Node* NodeForward(Node* HeadNode, Node* NewNode) {
+    if (NewNode == NULL)
+        return HeadNode;
+
+    NewNode->Next = NULL;
+
+    if (HeadNode == NULL) {
+        return NewNode;
+    }
+
+    Node* temp = HeadNode;
+    while (temp->Next != NULL) {
+        temp = temp->Next;
+    }
+
+    temp->Next = NewNode;
+    return HeadNode;
+}
 
 // Selection Sort
 template<typename T>
