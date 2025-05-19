@@ -2,6 +2,7 @@
 #include "Helpers.h"
 #include <cstdlib>
 #include <cstdio>
+#include <list>
 //Node
 typedef struct Node
 {
@@ -50,7 +51,7 @@ public:
 
     //void clearList();
     void forwardPrint();
-  // void reversePrint();
+  // voi2d reversePrint();
   // int getSize();
   // bool empty();
 };
@@ -99,7 +100,7 @@ while (temp != nullptr) {
     return HeadNode;
 }
 
-// Selection Sort
+
 template<typename T>
 internal void
 SelectionSort(T A[], int ArraySize) {
@@ -113,11 +114,19 @@ SelectionSort(T A[], int ArraySize) {
         }
         if (MaxIndex != i)
         {
-            Swap(A + i,A+MaxIndex);
+          Swap(A + i,A+MaxIndex);
+           printf("after swapping sorting: ");
+for (int i = 0; i < ArraySize; i++) {
+    
+    printf("%d, ", A[i]);
+}
+ printf("\n");
+
         }
 
     }
-}// Selection Sort
+}
+
 template<typename T>
 internal void
 DescSelectionSort(T A[], int ArraySize) {
@@ -131,7 +140,7 @@ DescSelectionSort(T A[], int ArraySize) {
         }
         if (MinIndex != i)
         {
-            Swap(A + i,A+MinIndex);
+          Swap(A + i,A+MinIndex);
         }
 
     }
@@ -139,34 +148,44 @@ DescSelectionSort(T A[], int ArraySize) {
 
 template<typename T>
 internal void
-Heapify (T A [] , int HeapSize, T Index)
+Heapify(T A [] , int HeapSize, T ParentIndex)
 {
-  int MaxIndex = Index;
+  int MaxIndex = ParentIndex;
 
-  int LeftIndex  = 2*Index +1;
-  int RightIndex = 2*Index +2;
+  int LeftIndex  = 2*ParentIndex +1;
+  int RightIndex = 2*ParentIndex +2;
 
   if (LeftIndex < HeapSize && A[LeftIndex] > A[MaxIndex])
-      MaxIndex = LeftIndex;
-  if (RightIndex < HeapSize && A[RightIndex] > A[MaxIndex])
-      MaxIndex = RightIndex;  
-  if (MaxIndex != Index) {
-    Swap(A+Index,A+MaxIndex);
-      Heapify (A, HeapSize, MaxIndex);
+        MaxIndex = LeftIndex;
+    if (RightIndex < HeapSize && A[RightIndex] > A[MaxIndex])
+        MaxIndex = RightIndex;  
+    if (MaxIndex != ParentIndex) {
+      Swap(A+ParentIndex,A+MaxIndex);
+        Heapify (A, HeapSize, MaxIndex);
+      }
     }
-  }
-  
+//heapsize = 4, parent index is 0, A [10,2,30,1]
+//maxindex = 0 = [10]
+//left index = 0*2+1= 1[2]
+//Right index = 0*2 + 2 = 2[30]
+//first if ... 2 < 10 so we dont do anything there
+//second if , 30 >10 so we set the maxindex to the right child hence its bigger
+//if the max index doesnt equal to the parent index we just simply swap them HEY THATS EASY WHAT IS THIS   
 
-
-//HeapSort
-template<typename T>
-internal void
-HeapSort( T A[],int ArraySize)
-{
-  for (int ParentIndex = (ArraySize-2)/2; ParentIndex>=0; ParentIndex --)
+  //HeapSort
+  template<typename T>
+  internal void
+  HeapSort( T A[],int ArraySize)
   {
-    Heapify(A,ArraySize,ParentIndex);
-  }
+    for (int ParentIndex = (ArraySize-2)/2; ParentIndex>=0; ParentIndex --)
+    {
+      Heapify(A,ArraySize,ParentIndex);
+    }
+    for (int i = 0; i < ArraySize; i++) {
+    
+    printf("%d, ", A[i]);
+}
+ printf("\n");
 
   for(int i = ArraySize-1; i>= 1; i--)
   {
@@ -190,5 +209,67 @@ DescHeapSort( T A[],int ArraySize)
     Heapify(A,ArraySize,ArraySize-1);
   }
 }
+
+template<typename T>
+internal void
+Merge(T Array[],int LeftIndex, int MidPoint,int RightIndex)
+{
+  //populating the left list and the right list
+   std::list<T> LeftList={};
+  for (int i = 0; i < MidPoint-LeftIndex+1; i++)
+      LeftList.push_back(Array[LeftIndex + i]);
+  
+  std::list<T> RightList={};
+  for (int i = 0; i < RightIndex-MidPoint; i++)
+      RightList.push_back(Array[MidPoint+1+i]);
+
+  int k = LeftIndex;
+  while (!LeftList.empty() && !RightList.empty()) {
+      if (LeftList.front() < RightList.front())
+      {
+          Array[k++] = LeftList.front();
+          LeftList.pop_front();
+      }
+      else
+      {
+          Array[k++] = RightList.front();
+          RightList.pop_front();
+      }
+  }
+  while (!LeftList.empty())
+  {
+      Array[k++] = LeftList.front();
+      LeftList.pop_front();
+  }
+  
+  while (!RightList.empty())
+  {
+      Array[k++] = RightList.front();
+      RightList.pop_front();
+  }
+
+  }
+
+  
+  
+template <typename T>
+internal void
+MergeSort(T Array[], int LeftIndex,int RightIndex)
+{
+  int MidPoint = 0;
+  //continue if it has more than one element to be sorted
+  if (LeftIndex < RightIndex)
+  {
+    //Get the mid point, then sort each segement
+    MidPoint = (LeftIndex + RightIndex)/2;
+    MergeSort(Array, LeftIndex,MidPoint);
+    MergeSort(Array, MidPoint+1, RightIndex);
+    //finally merge them all together
+    Merge(Array,LeftIndex,MidPoint,RightIndex);
+  }
+    
+}
+
 #define DATASTRUCTURES_H
 #endif
+

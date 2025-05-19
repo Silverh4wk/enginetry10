@@ -1,6 +1,6 @@
 #pragma once 
 #include <stdint.h>
-
+#include <iostream>
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
@@ -32,6 +32,18 @@ typedef uint32_t bool32;
 #else
 #define Assert(Expression)
 #endif
+
+template<typename T>
+internal void
+PrintArray(T Array[], int start, int end, const std::string & label)
+{
+    std::cout << label << ": [ ";
+    for (int i = start; i <= end; ++i) {
+        std::cout << Array[i] << " ";
+    }
+    std::cout << "]\n";
+}
+
 
 template<typename T> 
 internal void 
