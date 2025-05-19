@@ -270,6 +270,58 @@ MergeSort(T Array[], int LeftIndex,int RightIndex)
     
 }
 
+template <typename T>
+internal void 
+Partition(std::list<T>& List,
+    std::list<T>& Less,
+    std::list<T>& Equal,
+    std::list<T>& Greater)
+{
+    if (List.empty()) return;
+
+    T pivot = List.front();
+
+    while (!List.empty()) {
+        T e = List.front();
+        List.pop_front();  
+
+        if (e < pivot) Less.push_back(e);
+        else if (e > pivot) Greater.push_back(e);
+        else Equal.push_back(e);
+    }
+}
+//using stl only temporary
+template <typename T>
+internal void 
+QuickSort(std::list<T>& List) 
+{
+    if (List.size() <= 1) return;
+
+    std::list<T> Less, Equal, Greater;
+
+    Partition(List, Less, Equal, Greater);
+
+    QuickSort(Less);
+    QuickSort(Greater);
+
+    List.clear();  
+
+    while (!Less.empty()) {
+        List.push_back(Less.front());
+        Less.pop_front();
+    }
+
+    while (!Equal.empty()) {
+        List.push_back(Equal.front());
+        Equal.pop_front();
+    }
+
+    while (!Greater.empty()) {
+        List.push_back(Greater.front());
+        Greater.pop_front();
+    }
+}
+
 #define DATASTRUCTURES_H
 #endif
 

@@ -4,23 +4,18 @@
 #include <string.h>
 
 int main() {
-  //int A[] = { 67,36,89,1,37,56,27,82,89,27 };
-  //  int ArraySize = ArrayCount(A);
-  //  DescHeapSort(A,ArraySize);
-
-  //  printf("Array after sorting: ");
-  //  char Buffer[256];
-  //  Buffer[0] = '\0'; 
-
-  //  for (int i = 0; i < ArraySize; i++) {
-  //      char Temp[32];
-  //      sprintf_s(Temp, sizeof(Temp), "%d, ", A[i]);
-  //      strcat_s(Buffer, sizeof(Buffer), Temp);
-  //  }
-
-  //  printf("%s", Buffer); 
+ /* float A[] = { 67.23,36.2,89,1,37,56,27,82,89,27,515,20,20,20 };
+    int ArraySize = ArrayCount(A);
+    MergeSort(A,0,ArraySize-1);
+ */   
+   
+    std::list<double> List = { 10,2,5,6,4,8,1,2,3,5,48,4 };
+    QuickSort(List);
+    for (auto x : List)
+        std::cout << x << " ";
     
-    Node* NewNode= new Node(10);
+
+   /* Node* NewNode= new Node(10);
     Node* NextNode = new Node(20);
 
     NodeForward(NewNode, NextNode);
@@ -34,7 +29,7 @@ int main() {
    
     list.push_front(NewNode->Data);
     list.push_front(NextNode->Data);
-    list.forwardPrint();
+    list.forwardPrint();*/
 
 
 
